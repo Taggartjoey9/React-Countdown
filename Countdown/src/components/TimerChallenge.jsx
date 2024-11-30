@@ -1,29 +1,46 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
+import ResultModal from "./ResultModal";
 
 // eslint-disable-next-line react/prop-types
 export default function TimerChallenge({ title, targetTime }) {
 
-    const [timerExpired, setTimeExperied] = useState(false);
+    const timer = useRef();
+    const dialog = useRef();
+
+
+    const [timerStarted, setTimerStarted] = useState(false);
+
+    const [timerExpired, setTimerExpired] = useState(false);
+
 
         function handleStart() {
-            setTimeout(() => {setTimeExperied(true)}, targetTime * 1000);
-        }
+            timer.current = 
+            setTimeout(() => {setTimerExpired(true)}, targetTime * 1000);
+
+            setTimerStarted(true);
+        };
+
+        function handleStop() {
+            clearTimeout(timer.current);
+        };
 
     return (
+        <>
+        {timerExpired && <ResultModal ref={dialog} targetTime={targetTime} result='lost'/>}
         <section className="challenge">
             <h2>{title}</h2>
-            {timerExpired && <p>You Lost</p>}
             <p className="challenge-time">
                 {targetTime} second{targetTime > 1 ? 's' : ''}
             </p>
             <p>
-                <button onClick={handleStart}>
-                    Start Challenge
+                <button onClick={timerStarted ? handleStop : handleStart }>
+                    {timerStarted ? 'Stop' : 'Start'} Challenge
                 </button>
             </p>
-            <p className="">
-                Time is running... / Timer Inactive
+            <p className={timerStarted ? "active" : undefined}>
+                {timerStarted ? 'Time is running...' : 'Timer Inactive'}
             </p>
         </section>
+    </>
     )
 }
